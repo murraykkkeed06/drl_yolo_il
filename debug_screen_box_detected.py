@@ -57,7 +57,9 @@ while True:
         
     #print("checkpoint")
     # convert colors from BGR to RGB
-    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+
     #print(frame.shape)
     #(1080, 1920, 3)
     # write the frame
