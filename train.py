@@ -13,6 +13,7 @@ import utils
 def read_good_samples():
     with gzip.open('./data/data.pkl.gzip','rb') as f:
         data = pickle.load(f)
+        print(len(data["state"]))
         # read and stack
         x = utils.vstack(data["state"])
         y = utils.vstack(data["action"])
@@ -22,25 +23,19 @@ def read_good_samples():
     return x, y
 
 def preprocess_data(x, y):
-    x_pp = x.reshape(x.shape[0],1080,1920,1).astype("float32")
+    #x_pp = x.reshape(x.shape[0],1080,1920,1).astype("float32")
     y_pp = utils.action_arr2id2agent(y)
 
-    return x_pp, y_pp 
+    return x, y_pp 
 
 def net():
+    # mlp
     
     model = Sequential()
-    model.add(Conv2D(filters=32, kernel_size=(3,3),input_shape=(96,96,1),activation='relu',padding='same'))
-    model.add(Dropout(0.25))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(Conv2D(filters=64,kernel_size=(3,3),padding='same',activation='relu'))
-    model.add(Dropout(0.25))
-    model.add(MaxPooling2D(pool_size=(2,2)))
-    model.add(Flatten())
-    model.add(Dropout(0.25))
-    model.add(Dense(1024,activation='relu'))
-    model.add(Dropout(0.25))
-    model.add(Dense(utils.n_actions,activation='softmax'))
+    model.add(Dense(units=128, input_dim=4, kernel_initializer='normal', activation='relu'))
+    model.add(Dense(units=utils.n_actions, kernel_initializer='normal',activation='softmax'))
+    
+
     
 
     return model
@@ -57,6 +52,7 @@ def plot_action_histogram(actions, title):
 
 if __name__ == "__main__":
     x, y = read_good_samples()
+    print(x.shape)
     # turn to catgorical style and reshape
     x_pp, y_pp = preprocess_data(x, y)
 

@@ -13,8 +13,8 @@ def get_state():
     # get image from screen
     img = pyautogui.screenshot()
     # predict box and process
-    img = utils.predict_and_process(img)
-    return img
+    img , box = utils.predict_and_process(img)
+    return img, box
 
 def get_action():
     # action data
@@ -51,10 +51,10 @@ if __name__ == "__main__":
     while True:
         time.sleep(step_speed)
 
-        state = get_state()
+        state, state_box = get_state()
         action = get_action()
 
-        episode_samples["state"].append(state)
+        episode_samples["state"].append(state_box)
         episode_samples["action"].append(action)
 
         # show video and action values for debuging
@@ -76,6 +76,7 @@ if __name__ == "__main__":
         # stop recording and save data
         if kb.is_pressed("l"):
             print("save data.......")
+            time.sleep(5)
             good_samples["state"].append(episode_samples["state"])
             good_samples["action"].append(episode_samples["action"])
             store_data(good_samples, "./data")

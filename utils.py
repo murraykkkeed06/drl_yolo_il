@@ -8,7 +8,8 @@ import pyautogui
 
 
 # load the pretrained model and weight
-options = {"pbLoad": "built_graph/tiny-yolo-voc-new.pb", "metaLoad": "built_graph/tiny-yolo-voc-new.meta", "threshold": 0.1, "gpu": 0.8}
+options = {"pbLoad": "built_graph/yolov2-tiny-new.pb", "metaLoad": "built_graph/yolov2-tiny-new.meta", "threshold": 0.1, "gpu": 0.8}
+#options = {"pbLoad": "built_graph/tiny-yolo-voc-new.pb", "metaLoad": "built_graph/tiny-yolo-voc-new.meta", "threshold": 0.1, "gpu": 0.8}
 tfnet = TFNet(options)
 
 # action define by user
@@ -65,7 +66,7 @@ def action_arr2id2agent(arr):
 def predict_and_process(image):
     frame = np.array(image)
     result = tfnet.return_predict(frame)
-
+    box_arr = np.zeros(4)
     if len(result) > 0:
         # confidence list
         conf_list = []
@@ -82,15 +83,22 @@ def predict_and_process(image):
         frame[:, :] = [0, 0, 0]
         frame[rr, cc] = [255, 255, 255]
 
+        # mid_x, mid_y, w, h
+        box_arr = np.array([(((x2-x1)/2)+x1),(((y2-y1)/2)+y1),(x2-x1),(y2-y1)],dtype=np.float32)
+        
+
     else:
         frame[:, :] = [0, 0, 0]
 
+    
+    
     # turn shape to (1080,1920,)
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    return frame
+    return frame, box_arr
 
 def vstack(arr):
     stack = np.array(arr[0][:],dtype=np.float32)
+    
     for i in range(1, len(arr)):
-        stack = np.vstack((stack, arr[i][:]))
+        stack = np.vstack((stack, np.array(arr[i][:])))
     return stack

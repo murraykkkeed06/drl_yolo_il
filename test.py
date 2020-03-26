@@ -9,22 +9,23 @@ def get_state():
     # get image from screen
     img = pyautogui.screenshot()
     # predict box and process
-    img = utils.predict_and_process(img)
-    return img
+    img, box = utils.predict_and_process(img)
+    return img, box
 
 if __name__ == "__main__":
     # laod model
     model = load_model('my_model.h5')
 
-    steo = 0
+    step = 0
     while True:
-        state = get_state()
-        predict_result = model.predict(state)
-        utils.move(np.argmax(predict_result,axis=1)[0])
+        state, box = get_state()
+        box = box.reshape(1,box.shape[0]).astype(np.float32)
+        action = model.predict(box)
+        utils.move(np.argmax(action,axis=1)[0])
 
         if True:
             cv2.imshow("screenshot", state)
-            print("action value: ", action, "step: ", step)
+            print("action value: ", np.argmax(action,axis=1)[0], "step: ", step)
             if cv2.waitKey(1) == ord("q"):
                 cv2.destroyAllWindows()
                 break
